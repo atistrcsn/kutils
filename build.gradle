@@ -1,0 +1,104 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
+    }
+}
+
+plugins {
+    id "org.jetbrains.kotlin.jvm" version "1.2.31"
+}
+apply plugin: 'maven-publish'
+apply plugin: 'com.jfrog.bintray'
+
+ext.kotlinVersion = '1.2.31'
+
+group 'io.github.atistrcsn'
+version '1.0.0'
+jar.baseName 'kutils'
+
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
+    kotlinOptions {
+        freeCompilerArgs = ["-Xjsr305=strict"]
+        jvmTarget = 1.8
+        suppressWarnings = true
+    }
+}
+
+kotlin {
+    experimental {
+        coroutines "enable"
+    }
+}
+
+sourceSets {
+    main.kotlin.srcDirs += 'src/main/kotlin'
+    main.java.srcDirs += 'src/main/kotlin'
+}
+
+dependencies {
+    // Kotlin
+    compile("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlinVersion}")
+    compile("org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}")
+    compile("org.jetbrains.kotlinx:kotlinx-coroutines-core:0.22.5")
+
+    // Logging
+    compile("io.github.microutils:kotlin-logging:1.4.9")
+    compile("org.slf4j:slf4j-api:1.7.25")
+
+    testCompile "org.jetbrains.kotlin:kotlin-test:${kotlinVersion}"
+    testCompile "org.jetbrains.kotlin:kotlin-test-junit:${kotlinVersion}"
+}
+
+publishing {
+    publications {
+        KutilsBintrayPublication(MavenPublication) {
+            from components.java
+            groupId group
+            artifactId module.name
+            version project.version
+        }
+    }
+}
+
+bintray {
+    user = bintray_user
+    key = bintray_key
+    publications = ['KutilsBintrayPublication']
+    pkg {
+        repo = 'public'
+        name = 'kutils'
+        desc = 'Kotlin starter, kotlin utilities'
+        licenses = ['MIT']
+        vcsUrl = 'https://github.com/atistrcsn/kutils.git'
+        labels = ['kotlin', 'utils']
+        publicDownloadNumbers = true
+        githubRepo = 'atistrcsn/kutils' //Optional Github repository
+        githubReleaseNotesFile = 'README.md' //Optional Github readme file
+        version {
+            name = project.version
+            desc = bintray.pkg.desc
+            released = new Date()
+            vcsTag = project.version
+            gpg {
+                sign = true
+            }
+        }
+    }
+}
+
+task cleanBuildPublishArtifactory(group: 'kutils') {
+    dependsOn 'clean'
+    dependsOn 'build'
+    dependsOn 'publishToMavenLocal'
+    dependsOn 'bintrayUpload'
+    tasks.findByName('build').mustRunAfter 'clean'
+    tasks.findByName('publishToMavenLocal').mustRunAfter 'build'
+    tasks.findByName('bintrayUpload').mustRunAfter 'publishToMavenLocal'
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '4.6'
+}
