@@ -16,7 +16,7 @@ apply plugin: 'com.jfrog.bintray'
 ext.kotlinVersion = '1.2.31'
 
 group 'io.github.atistrcsn'
-version '1.0.0'
+version '1.0.1'
 jar.baseName 'kutils'
 
 tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {

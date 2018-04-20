@@ -1,7 +1,9 @@
 package io.github.kutils
 
 import java.time.DayOfWeek
+import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.LocalTime
 import java.time.Month
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -30,7 +32,7 @@ fun hunDateFormatter(pattern: String): DateTimeFormatter = DateTimeFormatter.ofP
 fun hunTimeFormatter(pattern: String): DateTimeFormatter = DateTimeFormatter.ofPattern(pattern, hunLocale)
 fun hunDateTimeFormatter(pattern: String): DateTimeFormatter = DateTimeFormatter.ofPattern(pattern, hunLocale)
 
-fun Temporal.local(pattern: String): String = hunDateTimeFormatter(pattern).format(this)
+fun Temporal.local(pattern: String): String = hunDateTimeFormatter(pattern).withZone(hunZone).format(this)
 
 fun Month.narrow(): String = getDisplayName(TextStyle.NARROW, hunLocale)
 fun Month.short(): String = getDisplayName(TextStyle.SHORT, hunLocale)
@@ -44,3 +46,15 @@ fun XMLGregorianCalendar.toLocalDateTime(zoneId: ZoneId = hunZone): LocalDateTim
 
 fun LocalDateTime.toXmlGregorianCalendar(): XMLGregorianCalendar =
         GregorianCalendar.from(atZone(hunZone)).let { DatatypeFactory.newInstance().newXMLGregorianCalendar(it) }
+
+data class LocalDateRangeQuery(val startDate: LocalDate, val endDate: LocalDate) {
+    constructor(sameDay: LocalDate) : this(sameDay, sameDay)
+}
+
+fun LocalDateRangeQuery.toLocalDateTimeQuery(): LocalDateTimeRangeQuery =
+        LocalDateTimeRangeQuery(LocalDateTime.of(startDate, LocalTime.MIN), LocalDateTime.of(endDate, LocalTime.MAX))
+
+class LocalDateTimeRangeQuery(val startDateTime: LocalDateTime, val endDateTime: LocalDateTime)
+
+fun LocalDateTimeRangeQuery.toLocalDateRangeQuery(): LocalDateRangeQuery =
+        LocalDateRangeQuery(startDateTime.toLocalDate(), endDateTime.toLocalDate())
