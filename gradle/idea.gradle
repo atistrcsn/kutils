@@ -1,0 +1,21 @@
+apply plugin: 'idea'
+
+def mainOutPath = "$buildDir/classes/kotlin/main"
+def testOutPath = "$buildDir/classes/kotlin/test"
+
+idea {
+    module {
+        inheritOutputDirs = false
+        outputDir file(mainOutPath)
+        testOutputDir file(testOutPath)
+        downloadJavadoc = true
+        downloadSources = true
+    }
+}
+if (project.convention.findPlugin(JavaPluginConvention)) {
+    // Change the output directory for the main and test source sets back to the old path
+    sourceSets.main.java.outputDir = file(mainOutPath)
+    sourceSets.main.kotlin.outputDir = file(mainOutPath)
+    sourceSets.test.java.outputDir = file(testOutPath)
+    sourceSets.test.kotlin.outputDir = file(testOutPath)
+}
