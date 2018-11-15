@@ -21,14 +21,7 @@ compileTestKotlin {
     kotlinOptions {
         freeCompilerArgs = ["-Xjsr305=strict"]
         jvmTarget = JavaVersion.VERSION_1_8
-        suppressWarnings = true
-    }
-}
-
-
-kotlin {
-    experimental {
-        coroutines "enable"
+//        suppressWarnings = true
     }
 }
 
