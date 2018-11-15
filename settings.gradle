@@ -1,13 +1,1 @@
-pluginManagement {
-    repositories {
-        maven {
-            url "${artifactory_contextUrl}/maven-dev"
-            credentials {
-                username = "${artifactory_user}"
-                password = "${artifactory_password}"
-            }
-        }
-    }
-}
-
 rootProject.name = 'kutils'

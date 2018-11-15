@@ -1,19 +1,17 @@
-buildscript {
-    repositories {
-        jcenter()
-    }
+buildscript { scriptHandler ->
+    apply from: "$rootProject.rootDir/gradle/repositories.gradle", to: scriptHandler
+    ext.kotlin_version = '1.2.31'
     dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
     }
 }
 
-plugins {
-    id "org.jetbrains.kotlin.jvm" version "1.2.31"
-}
+apply from: "$rootDir/gradle/kotlin.gradle"
+apply from: "$rootDir/gradle/repositories.gradle"
+apply from: "$rootDir/gradle/idea.gradle"
 apply plugin: 'maven-publish'
 apply plugin: 'com.jfrog.bintray'
-
-ext.kotlinVersion = '1.2.31'
 
 group 'io.github.atistrcsn'
 version '1.0.1'
@@ -27,29 +25,13 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
     }
 }
 
-kotlin {
-    experimental {
-        coroutines "enable"
-    }
-}
-
-sourceSets {
-    main.kotlin.srcDirs += 'src/main/kotlin'
-    main.java.srcDirs += 'src/main/kotlin'
-}
-
 dependencies {
-    // Kotlin
-    compile("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlinVersion}")
-    compile("org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}")
-    compile("org.jetbrains.kotlinx:kotlinx-coroutines-core:0.22.5")
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:0.22.5"
+    implementation "io.github.microutils:kotlin-logging:1.4.9"
+    implementation "org.slf4j:slf4j-api:1.7.25"
 
-    // Logging
-    compile("io.github.microutils:kotlin-logging:1.4.9")
-    compile("org.slf4j:slf4j-api:1.7.25")
-
-    testCompile "org.jetbrains.kotlin:kotlin-test:${kotlinVersion}"
-    testCompile "org.jetbrains.kotlin:kotlin-test-junit:${kotlinVersion}"
+    testImplementation "org.jetbrains.kotlin:kotlin-test"
+    testImplementation "org.jetbrains.kotlin:kotlin-test-junit"
 }
 
 publishing {
@@ -59,8 +41,24 @@ publishing {
             groupId group
             artifactId module.name
             version project.version
+            artifact(sourcesJar) {
+                classifier = 'sources'
+            }
         }
     }
+}
+
+jar {
+    exclude("**/resources/rebel.xml")
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives sourcesJar
 }
 
 bintray {
@@ -89,16 +87,22 @@ bintray {
     }
 }
 
-task cleanBuildPublishArtifactory(group: 'kutils') {
+task cleanPubLocal() {
+    group 'kutils'
     dependsOn 'clean'
-    dependsOn 'build'
+    dependsOn 'assemble'
     dependsOn 'publishToMavenLocal'
+    tasks.findByName('assemble').mustRunAfter 'clean'
+    tasks.findByName('publishToMavenLocal').mustRunAfter 'assemble'
+}
+
+task cleanBuildPublishArtifactory() {
+    group 'kutils'
+    dependsOn 'cleanPubLocal'
     dependsOn 'bintrayUpload'
-    tasks.findByName('build').mustRunAfter 'clean'
-    tasks.findByName('publishToMavenLocal').mustRunAfter 'build'
-    tasks.findByName('bintrayUpload').mustRunAfter 'publishToMavenLocal'
+    tasks.findByName('bintrayUpload').mustRunAfter 'cleanPubLocal'
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '4.6'
+    gradleVersion = '4.8.1'
 }

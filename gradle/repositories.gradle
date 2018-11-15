@@ -1,0 +1,11 @@
+repositories {
+    mavenLocal()
+    maven {
+        url "${System.getenv("ARTIFACTORY_REPO_URL")}"
+        credentials {
+            username = "${System.getenv("ARTIFACTORY_USER")}"
+            password = "${System.getenv("ARTIFACTORY_PASSWORD")}"
+        }
+        name = "maven-dev"
+    }
+}
