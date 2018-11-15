@@ -6,6 +6,9 @@ buildscript { scriptHandler ->
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
     }
 }
+plugins {
+    id 'pl.allegro.tech.build.axion-release' version '1.9.3'
+}
 
 apply from: "$rootDir/gradle/kotlin.gradle"
 apply from: "$rootDir/gradle/repositories.gradle"
@@ -14,16 +17,13 @@ apply plugin: 'maven-publish'
 apply plugin: 'com.jfrog.bintray'
 
 group 'io.github.atistrcsn'
-version '1.0.1'
 jar.baseName 'kutils'
 
-tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
-    kotlinOptions {
-        freeCompilerArgs = ["-Xjsr305=strict"]
-        jvmTarget = 1.8
-        suppressWarnings = true
-    }
+scmVersion {
+    versionCreator 'versionWithBranch'
+    tag.prefix = ''
 }
+version = scmVersion.version
 
 dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:0.22.5"
