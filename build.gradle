@@ -41,9 +41,9 @@ publishing {
             groupId group
             artifactId module.name
             version project.version
-            artifact(sourcesJar) {
-                classifier = 'sources'
-            }
+//            artifact(sourcesJar) {
+//                classifier = 'sources'
+//            }
         }
     }
 }
@@ -101,8 +101,4 @@ task cleanBuildPublishArtifactory() {
     dependsOn 'cleanPubLocal'
     dependsOn 'bintrayUpload'
     tasks.findByName('bintrayUpload').mustRunAfter 'cleanPubLocal'
-}
-
-task wrapper(type: Wrapper) {
-    gradleVersion = '4.8.1'
 }
