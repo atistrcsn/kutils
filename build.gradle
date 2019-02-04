@@ -24,6 +24,7 @@ scmVersion {
     tag.prefix = ''
 }
 version = scmVersion.version
+println("Project version: ${version}")
 
 dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.0.1"
@@ -88,6 +89,9 @@ bintray {
 }
 
 task cleanPubLocal() {
+    beforeEvaluate {
+        println("Project version: ${project.version}")
+    }
     group 'kutils'
     dependsOn 'clean'
     dependsOn 'assemble'
