@@ -1,6 +1,6 @@
 buildscript { scriptHandler ->
     apply from: "$rootProject.rootDir/gradle/repositories.gradle", to: scriptHandler
-    ext.kotlin_version = '1.2.31'
+    ext.kotlin_version = '1.3.0'
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
@@ -26,8 +26,8 @@ scmVersion {
 version = scmVersion.version
 
 dependencies {
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:0.22.5"
-    implementation "io.github.microutils:kotlin-logging:1.4.9"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.0.1"
+    implementation "io.github.microutils:kotlin-logging:1.5.9"
     implementation "org.slf4j:slf4j-api:1.7.25"
 
     testImplementation "org.jetbrains.kotlin:kotlin-test"
@@ -41,9 +41,9 @@ publishing {
             groupId group
             artifactId module.name
             version project.version
-            artifact(sourcesJar) {
-                classifier = 'sources'
-            }
+//            artifact(sourcesJar) {
+//                classifier = 'sources'
+//            }
         }
     }
 }
@@ -101,8 +101,4 @@ task cleanBuildPublishArtifactory() {
     dependsOn 'cleanPubLocal'
     dependsOn 'bintrayUpload'
     tasks.findByName('bintrayUpload').mustRunAfter 'cleanPubLocal'
-}
-
-task wrapper(type: Wrapper) {
-    gradleVersion = '4.8.1'
 }

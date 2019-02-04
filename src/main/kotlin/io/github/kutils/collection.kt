@@ -13,3 +13,6 @@ inline fun <T> Iterable<T>.sumFloatBy(selector: (T) -> Float): Float {
     }
     return sum
 }
+
+public fun <T> Iterable<T>.joinToUnorderedList(transform: ((T) -> CharSequence)): String =
+    joinToString("</li><li>", "<ul><li>", "</li></ul>", transform = transform)
