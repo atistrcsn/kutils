@@ -1,5 +1,7 @@
 repositories {
     mavenLocal()
+    mavenCentral()
+    jcenter()
     maven {
         url "${System.getenv("ARTIFACTORY_REPO_URL")}"
         credentials {

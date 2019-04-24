@@ -8,6 +8,7 @@ buildscript { scriptHandler ->
 }
 plugins {
     id 'pl.allegro.tech.build.axion-release' version '1.9.3'
+    id 'idea'
 }
 
 apply from: "$rootDir/gradle/kotlin.gradle"
@@ -37,14 +38,16 @@ dependencies {
 
 publishing {
     publications {
-        KutilsBintrayPublication(MavenPublication) {
+        mavenJava(MavenPublication) {
             from components.java
             groupId group
             artifactId module.name
             version project.version
-//            artifact(sourcesJar) {
-//                classifier = 'sources'
-//            }
+            afterEvaluate {
+                artifact(sourcesJar) {
+                    classifier = 'sources'
+                }
+            }
         }
     }
 }
@@ -63,9 +66,9 @@ artifacts {
 }
 
 bintray {
-    user = bintray_user
-    key = bintray_key
-    publications = ['KutilsBintrayPublication']
+    user = "${System.getenv("BINTRAY_USER")}"
+    key = "${System.getenv("BINTRAY_KEY")}"
+    publications = ['mavenJava']
     pkg {
         repo = 'public'
         name = 'kutils'
@@ -97,7 +100,7 @@ task cleanPubLocal() {
     tasks.findByName('publishToMavenLocal').mustRunAfter 'assemble'
 }
 
-task cleanBuildPublishArtifactory() {
+task publishToBintray() {
     group 'kutils'
     dependsOn 'cleanPubLocal'
     dependsOn 'bintrayUpload'

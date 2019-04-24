@@ -9,7 +9,13 @@ idea {
         outputDir file(mainOutPath)
         testOutputDir file(testOutPath)
         downloadJavadoc = true
-        downloadSources = true
+        downloadSources = false
+
+        def excluded = new HashSet<File>()
+        [".idea"].each {
+            excluded << file("$buildDir/$it")
+        }
+        setExcludeDirs(excluded)
     }
 }
 if (project.convention.findPlugin(JavaPluginConvention)) {
